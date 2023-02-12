@@ -70,11 +70,11 @@ class _MyHomePageState extends State<MyHomePage> {
         legend: Legend(isVisible: true),
         tooltipBehavior: _tooltipBehavior,
         //primaryYAxis: CategoryAxis(),
-        series: <LineSeries>[
-          LineSeries<GraphData, double>(
+        series: <FastLineSeries>[
+          FastLineSeries<GraphData, double>(
             name: 'Data',
             dataSource: _chartData,
-            xValueMapper: (GraphData yAxisData, _) => yAxisData.time,
+            xValueMapper: (GraphData xAxisData, _) => xAxisData.time,
             yValueMapper: (GraphData yAxisData, _) => yAxisData.yAxixData,
             // ignore: prefer_const_constructors
             dataLabelSettings: DataLabelSettings(isVisible: true),
