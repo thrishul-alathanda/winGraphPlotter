@@ -70,19 +70,20 @@ class _MyHomePageState extends State<MyHomePage> {
         legend: Legend(isVisible: true),
         tooltipBehavior: _tooltipBehavior,
         //primaryYAxis: CategoryAxis(),
-        series: <SplineSeries>[
-          SplineSeries<GraphData, double>(
-              name: 'Data',
-              dataSource: _chartData,
-              xValueMapper: (GraphData yAxisData, _) => yAxisData.time,
-              yValueMapper: (GraphData yAxisData, _) => yAxisData.yAxixData,
-              // ignore: prefer_const_constructors
-              dataLabelSettings: DataLabelSettings(isVisible: true),
-              enableTooltip: true,
-              color: Colors.black,
-              width: 3,
-              opacity: 1,
-              cardinalSplineTension: 0.9)
+        series: <LineSeries>[
+          LineSeries<GraphData, double>(
+            name: 'Data',
+            dataSource: _chartData,
+            xValueMapper: (GraphData yAxisData, _) => yAxisData.time,
+            yValueMapper: (GraphData yAxisData, _) => yAxisData.yAxixData,
+            // ignore: prefer_const_constructors
+            dataLabelSettings: DataLabelSettings(isVisible: true),
+            enableTooltip: true,
+            color: Colors.black,
+            width: 3,
+            opacity: 1,
+            //cardinalSplineTension: 0.1  //This is used for SplineSeries;
+          )
         ],
         primaryXAxis: NumericAxis(edgeLabelPlacement: EdgeLabelPlacement.shift),
         //  primaryXAxis: CategoryAxis(title: AxisTitle(text: "Time")),
@@ -93,6 +94,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<GraphData> getChartData() {
     final List<GraphData> chartData = [
+      // ignore: todo
+      // TODO Read data from *.txt and parse here
+
       GraphData(1.1, 0.5),
       GraphData(1.2, 0.7),
       GraphData(1.3, 1.3),
