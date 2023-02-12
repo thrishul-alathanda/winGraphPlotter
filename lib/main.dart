@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<GraphData> getChartData() {
     final List<GraphData> chartData = [
       // ignore: todo
-      // TODO Read data from *.txt and parse here
+      // TODO Read data from *.txt, parse and send it here
 
       GraphData(1.1, 0.5),
       GraphData(1.2, 0.7),
