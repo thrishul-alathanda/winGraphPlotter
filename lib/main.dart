@@ -1,6 +1,92 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-//import 'package:intl/intl.dart';    //not why i used this.
+import 'package:charts_flutter/flutter.dart';
+
+class GraphData {
+  final double x;
+  final double y;
+
+  GraphData(this.x, this.y);
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<GraphData> _chartData = [];
+
+  Future<void> _loadData() async {
+    try {
+      final file = File('win_graph/src/data/data.txt');
+      final contents = await file.readAsString();
+      final lines = contents.trim().split('\n');
+
+      final samplingRateLine = lines[0];
+      final samplingRate = int.parse(samplingRateLine.split(':')[1].trim());
+
+      final yAxisData = lines[1].split('\\').map(double.parse).toList();
+
+      final xAxisData =
+          List.generate(yAxisData.length, (i) => i / samplingRate);
+
+      final data = List.generate(xAxisData.length, (i) {
+        final x = xAxisData[i];
+        final y = yAxisData[i];
+        return GraphData(x, y);
+      });
+
+      setState(() {
+        _chartData = data;
+      });
+    } catch (e) {
+      print('Error loading data: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: _chartData.isNotEmpty
+          ? LineChart(
+              [
+                Series<GraphData, double>(
+                  id: 'data',
+                  colorFn: (_, __) => MaterialPalette.blue.shadeDefault,
+                  domainFn: (data, _) => data.x,
+                  measureFn: (data, _) => data.y,
+                  data: _chartData,
+                )
+              ],
+              animate: false,
+              domainAxis: NumericAxisSpec(
+                tickProviderSpec: StaticNumericTickProviderSpec(<TickSpec<num>>[
+                  for (var i = 0; i < _chartData.length; i += 10)
+                    TickSpec<num>(i.toDouble())
+                ]),
+              ),
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  final String title;
+
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
 
 void main() {
   runApp(const MyApp());
@@ -9,90 +95,14 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WinGraph',
+      title: 'Graph Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Windows Graph'),
+      home: MyHomePage(title: 'Graph Demo'),
     );
   }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  List<GraphData> _chartData = [];
-  TooltipBehavior _tooltipBehavior = TooltipBehavior(enable: false);
-
-  @override
-  void initState() {
-    _chartData = getChartData();
-    _tooltipBehavior = TooltipBehavior(enable: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      // ignore: prefer_const_literals_to_create_immutables
-      body: SfCartesianChart(
-        title: ChartTitle(text: 'Testing Data'),
-        legend: Legend(isVisible: true),
-        tooltipBehavior: _tooltipBehavior,
-        //primaryYAxis: CategoryAxis(),
-        series: <FastLineSeries>[
-          FastLineSeries<GraphData, double>(
-            name: 'Data',
-            dataSource: _chartData,
-            xValueMapper: (GraphData xAxisData, _) => xAxisData.time,
-            yValueMapper: (GraphData yAxisData, _) => yAxisData.yAxixData,
-            // ignore: prefer_const_constructors
-            dataLabelSettings: DataLabelSettings(isVisible: true),
-            enableTooltip: true,
-            color: Colors.black,
-            width: 3,
-            opacity: 1,
-            //cardinalSplineTension: 0.1  //This is used for SplineSeries;
-          )
-        ],
-        primaryXAxis: NumericAxis(edgeLabelPlacement: EdgeLabelPlacement.shift),
-        //  primaryXAxis: CategoryAxis(title: AxisTitle(text: "Time")),
-        //primaryYAxis: NumericAxis(numberFormat: NumberFormat.decimalPattern()),
-      ),
-    ));
-  }
-
-  List<GraphData> getChartData() {
-    final List<GraphData> chartData = [
-      // ignore: todo
-      // TODO Read data from *.txt, parse and send it here
-
-      GraphData(1.1, 0.5),
-      GraphData(1.2, 0.7),
-      GraphData(1.3, 1.3),
-      GraphData(1.4, 0.2),
-      GraphData(1.5, 1.8),
-      GraphData(1.6, 1.7),
-      GraphData(1.7, 1.8)
-    ];
-    return chartData;
-  }
-}
-
-class GraphData {
-  GraphData(this.time, this.yAxixData);
-  final double time;
-  final double yAxixData;
 }
